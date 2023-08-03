@@ -24,7 +24,7 @@ def product(product_id):
     conn = pymysql.connect(**config)
 
     with conn.cursor() as cursor:
-        sql = "SELECT * FROM PRODUCT WHERE ID = %s"
+        sql = "SELECT * FROM product WHERE ID = %s"
         cursor.execute(sql, (product_id,))
         product = cursor.fetchone()
 
