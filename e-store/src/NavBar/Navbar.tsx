@@ -4,7 +4,7 @@ import React from 'react';
 const Navbar: React.FC = () => {
   return (
     <nav>
-      <div className="container mx-auto flex items-center justify-between py-4">
+      <div className="container mx-auto flex items-center justify-between py-4 content-center">
         <a href="/" className="text-2xl font-bold">
           My E-Store
         </a>
