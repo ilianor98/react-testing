@@ -36,8 +36,36 @@ def product(product_id):
             "name": product["name"],
             "description": product["description"],
             "img": product["img"],
+            "id": product["id"],
         }
         return jsonify(data)
+    else:
+        return jsonify({"message": "Product not found"}), 404
+
+
+@app.route("/api/all_products")
+def all_products():
+    conn = pymysql.connect(**config)
+
+    with conn.cursor() as cursor:
+        sql = "SELECT * FROM product"
+        cursor.execute(sql)
+        products = cursor.fetchall()
+
+    conn.close()
+    if products:
+        product_list = []
+        for product in products:
+            data = {
+                "name": product["name"],
+                "description": product["description"],
+                "img": product["img"],
+                "id": product["id"],
+            }
+            product_list.append(data)
+        print("product_list OK")
+        return jsonify(product_list)
+
     else:
         return jsonify({"message": "Product not found"}), 404
 
