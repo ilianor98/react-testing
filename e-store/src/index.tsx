@@ -7,6 +7,7 @@ import App from './App';
 import ProductDetails from './ProductDetails/ProductDetails';
 import AllProducts from './AllProducts/AllProducts';
 import Navbar from './NavBar/Navbar';
+import Login from './LogIn/Login';
 
 const Index: React.FC = () => {
   return (
@@ -46,6 +47,7 @@ const Root: React.FC = () => {
           <Route path="/" element={<App />} />
           <Route path="/product/:productId" element={<ProductDetails />} />
           <Route path="/all_products" element={<AllProducts />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </Router>
     );

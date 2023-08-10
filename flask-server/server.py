@@ -1,9 +1,15 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
-import pymysql
+import pymysql, jwt
+from datetime import datetime, timedelta
+
+# from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 CORS(app)
+# bcrypt = Bcrypt(app)
+
+SECRET_KEY = "my-secret-key"
 
 config = {
     "user": "root",
@@ -68,6 +74,50 @@ def all_products():
 
     else:
         return jsonify({"message": "Product not found"}), 404
+
+
+# Generate JWT on login
+def generate_jwt(user_id):
+    payload = {
+        "user_id": user_id,
+        "exp": datetime.utcnow() + timedelta(days=1),  # Set token expiration time
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
+
+@app.route("/api/login", methods=["POST"])
+def login():
+    data = request.json
+    email = data.get("email")
+    password = data.get("password")
+
+    conn = pymysql.connect(**config)
+
+    with conn.cursor() as cursor:
+        sql = "SELECT * FROM user WHERE email = %s AND password = %s"
+        cursor.execute(
+            sql,
+            (
+                email,
+                password,
+            ),
+        )
+        user = cursor.fetchone()
+
+    conn.close()
+
+    if user:
+        user_data = {
+            "id": user["id"],
+            "username": user["username"],
+            "email": user["email"],
+        }
+        # Generate JWT
+        access_token = generate_jwt(user_data)
+
+        return jsonify({"message": "Login successful", "access_token": access_token})
+
+    return jsonify({"message": "Invalid credentials"}), 401
 
 
 if __name__ == "__main__":
