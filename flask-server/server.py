@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import pymysql, jwt
+from jwt import encode
 from datetime import datetime, timedelta
 
 # from flask_bcrypt import Bcrypt
@@ -32,7 +33,7 @@ def product(product_id):
     conn = pymysql.connect(**config)
 
     with conn.cursor() as cursor:
-        sql = "SELECT * FROM product WHERE ID = %s"
+        sql = "select p.*, pr.price from product p inner join price pr on p.id= pr.product_id where pr.product_id = %s;"
         cursor.execute(sql, (product_id,))
         product = cursor.fetchone()
 
@@ -43,6 +44,7 @@ def product(product_id):
             "description": product["description"],
             "img": product["img"],
             "id": product["id"],
+            "price": product["price"],
         }
         return jsonify(data)
     else:
@@ -54,7 +56,7 @@ def all_products():
     conn = pymysql.connect(**config)
 
     with conn.cursor() as cursor:
-        sql = "SELECT * FROM product"
+        sql = "select p.*, pr.price from product p inner join price pr on p.id= pr.product_id order by pr.product_id;"
         cursor.execute(sql)
         products = cursor.fetchall()
 
@@ -67,6 +69,7 @@ def all_products():
                 "description": product["description"],
                 "img": product["img"],
                 "id": product["id"],
+                "price": product["price"],
             }
             product_list.append(data)
         print("product_list OK")
@@ -108,7 +111,7 @@ def login():
 
     if user:
         user_data = {
-            "id": user["id"],
+            "user_id": user["id"],
             "username": user["username"],
             "email": user["email"],
         }
@@ -118,6 +121,70 @@ def login():
         return jsonify({"message": "Login successful", "access_token": access_token})
 
     return jsonify({"message": "Invalid credentials"}), 401
+
+
+@app.route("/api/logout", methods=["POST"])
+def logout():
+    # Assuming you receive the access token in the request JSON
+    data = request.json
+    access_token = data.get("access_token")
+
+    # Here, you might want to add some validation and error handling for the token
+    # For example, you could check if the token is valid and not expired
+    # You can use the jwt.decode function for this
+
+    # If the token is valid, you can just return a success message
+    return jsonify({"message": "Logout successful"}), 200
+
+
+@app.route("/api/new_user", methods=["POST"])
+def new_user():
+    data = request.json
+    email = data.get("email")
+    username = data.get("username")
+    password = data.get("password")
+
+    try:
+        conn = pymysql.connect(**config)
+
+        with conn.cursor() as cursor:
+            sql = "INSERT INTO user(username, password, email) VALUES (%s, %s, %s)"
+            cursor.execute(sql, (username, password, email))
+
+        conn.commit()
+        conn.close()
+
+        return (
+            jsonify({"message": "User created successfully"}),
+            201,
+        )  # HTTP status code for created
+
+    except Exception as e:
+        print("Error:", e)
+        return (
+            jsonify({"message": "An error occurred"}),
+            500,
+        )  # HTTP status code for internal server error
+
+
+@app.route("/api/cart", methods=["GET"])
+def get_cart():
+    # Get the user_id from the request headers
+    user_id = request.headers.get("X-User-Id")
+
+    conn = pymysql.connect(**config)
+
+    with conn.cursor() as cursor:
+        sql = "SELECT c.quantity, p.img, p.name, pr.price FROM cart c INNER JOIN product p ON c.product_id=p.id INNER JOIN price pr ON p.id=pr.product_id WHERE c.user_id = %s;"
+        cursor.execute(sql, (user_id,))
+        cart_items = cursor.fetchall()
+
+    conn.close()
+
+    if cart_items:
+        return jsonify(cart_items)
+    else:
+        return jsonify({"message": "Cart is empty"}), 404
 
 
 if __name__ == "__main__":

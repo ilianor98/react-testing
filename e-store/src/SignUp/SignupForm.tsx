@@ -1,44 +1,39 @@
 import React, { useState } from 'react';
 
-const LoginForm = () => {
+const SignUpForm: React.FC = () => {
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [loginMessage, setLoginMessage] = useState('');
+  const [signupMessage, setSignupMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:8000/api/login', {
+      const response = await fetch('http://localhost:8000/api/new_user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, username, password }),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        // Store the token in localStorage
-        localStorage.setItem('access_token', data.access_token);
-        localStorage.setItem('user_id', data.user.id);
-        setLoginMessage('Login successful');
-        window.location.href = '/';
-
-        // Optionally redirect or update the UI for logged-in state
+      if (response.status === 201) {
+        setSignupMessage('User created successfully');
       } else {
-        setLoginMessage(data.message || 'Login failed');
+        setSignupMessage('An error occurred.');
       }
     } catch (error) {
       console.error('Error:', error);
-      setLoginMessage('An error occurred.');
+      setSignupMessage('An error occurred.');
     }
   };
 
   return (
     <div>
-      <h2>Log In</h2>
+      <h2>Sign Up</h2>
       <form onSubmit={handleSubmit}>
         <label htmlFor="email">Email:</label>
         <input
@@ -47,6 +42,18 @@ const LoginForm = () => {
           name="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <br />
+        <br />
+
+        <label htmlFor="username">Username:</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
         />
         <br />
@@ -64,11 +71,11 @@ const LoginForm = () => {
         <br />
         <br />
 
-        <button type="submit">Log In</button>
+        <button type="submit">Sign Up</button>
       </form>
-      <div>{loginMessage}</div>
+      <div>{signupMessage}</div>
     </div>
   );
 };
 
-export default LoginForm;
+export default SignUpForm;

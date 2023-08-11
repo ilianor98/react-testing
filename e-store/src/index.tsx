@@ -8,6 +8,7 @@ import ProductDetails from './ProductDetails/ProductDetails';
 import AllProducts from './AllProducts/AllProducts';
 import Navbar from './NavBar/Navbar';
 import Login from './LogIn/Login';
+import Signup from './SignUp/Signup'
 
 const Index: React.FC = () => {
   return (
@@ -48,6 +49,7 @@ const Root: React.FC = () => {
           <Route path="/product/:productId" element={<ProductDetails />} />
           <Route path="/all_products" element={<AllProducts />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
         </Routes>
       </Router>
     );

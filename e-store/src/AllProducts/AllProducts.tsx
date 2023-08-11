@@ -7,6 +7,7 @@ interface Product {
   name: string;
   description: string;
   img: string;
+  price: string;
 }
 
 const AllProducts: React.FC = () => {
@@ -39,6 +40,7 @@ const AllProducts: React.FC = () => {
                 alt={product.name}
               />
             </div>
+            <p>{product.price} $</p>
           </div>
         </Link>
       ))}
