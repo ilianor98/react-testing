@@ -118,7 +118,13 @@ def login():
         # Generate JWT
         access_token = generate_jwt(user_data)
 
-        return jsonify({"message": "Login successful", "access_token": access_token})
+        return jsonify(
+            {
+                "message": "Login successful",
+                "access_token": access_token,
+                "user_id": user_data["user_id"],
+            }
+        )
 
     return jsonify({"message": "Invalid credentials"}), 401
 
@@ -185,6 +191,32 @@ def get_cart():
         return jsonify(cart_items)
     else:
         return jsonify({"message": "Cart is empty"}), 404
+
+
+@app.route("/api/add_to_cart", methods=["POST"])
+def add_to_cart():
+    product_id = request.headers.get("product_id")
+    user_id = request.headers.get("user_id")
+    conn = pymysql.connect(**config)
+
+    with conn.cursor() as cursor:
+        sql = "INSERT INTO cart(user_id, product_id, quantity) VALUES (%s, %s, 1)"
+        cursor.execute(
+            sql,
+            (
+                user_id,
+                product_id,
+            ),
+        )
+        result = cursor.fetchone()
+
+    conn.commit()
+    conn.close()
+
+    if result:
+        return jsonify({"message": "Added to cart"})
+    else:
+        return jsonify({"message": "Not added to cart"}), 404
 
 
 if __name__ == "__main__":

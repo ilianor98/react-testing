@@ -3,7 +3,6 @@ import CartDialog from '@/Cart/CartDialog';
 
 const Navbar: React.FC = () => {
   const isLoggedIn = localStorage.getItem('access_token');
-  const user_id = localStorage.getItem('user_id');
 
   const handleLogout = () => {
     // Clear the access token from local storage
@@ -55,7 +54,7 @@ const Navbar: React.FC = () => {
           )}
         </div>
       </div>
-      {cartDialogOpen && <CartDialog onClose={handleCloseCartDialog} userId={user_id} />}
+      {cartDialogOpen && <CartDialog onClose={handleCloseCartDialog}/>}
     </nav>
   );
 };
