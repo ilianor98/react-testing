@@ -12,30 +12,8 @@ import Signup from './SignUp/Signup'
 
 const Index: React.FC = () => {
   return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="container mx-auto p-8">
-      <h1>Welcome to My E-Store TEST TEST</h1>
-      <p>Choose an option:</p>
-      <ul className='flex'>
-        <li className='flex'>
-          <Link to="/product/1">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              View Product 1
-            </button>
-          </Link>
-          <Link to="/product/2">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              View Product 2
-            </button>
-          </Link>
-          <Link to="/all_products">
-            <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-              View all products
-            </button>
-          </Link>
-        </li>
-      </ul>
-      </div>
+    <div>
+      <h1>test</h1>
     </div>
   );
 };

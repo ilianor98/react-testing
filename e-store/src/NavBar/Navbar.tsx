@@ -7,11 +7,12 @@ const Navbar: React.FC = () => {
   const handleLogout = () => {
     // Clear the access token from local storage
     localStorage.removeItem('access_token');
+    localStorage.setItem('user_id', "0");
 
     // Perform any additional logout-related actions, e.g., notify the server
 
-    // Redirect to the login page
-    window.location.href = '/'; // You might need to adjust the URL
+    // Redirect to the index page
+    window.location.href = '/';
   };
 
   const [cartDialogOpen, setCartDialogOpen] = useState(false);

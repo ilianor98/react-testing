@@ -30,7 +30,7 @@ const AllProducts: React.FC = () => {
     <main className='m-24 rounded-md grid grid-cols-4 gap-12'>
       {products.map((product) => (
         <Link to={`/product/${product.id}`} key={product.id}>
-          <div className='col-span-4 md:col-span-2'>
+          <div className='col-span-4 md:col-span-2 bg-slate-700 text-center'>
             <h1>{product.name}</h1>
             <p>{product.description}</p>
             <div>

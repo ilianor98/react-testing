@@ -3,6 +3,7 @@ from flask_cors import CORS
 import pymysql, jwt
 from jwt import encode
 from datetime import datetime, timedelta
+from pymysql.err import Error
 
 # from flask_bcrypt import Bcrypt
 
@@ -181,7 +182,7 @@ def get_cart():
     conn = pymysql.connect(**config)
 
     with conn.cursor() as cursor:
-        sql = "SELECT c.quantity, p.img, p.name, pr.price FROM cart c INNER JOIN product p ON c.product_id=p.id INNER JOIN price pr ON p.id=pr.product_id WHERE c.user_id = %s;"
+        sql = "SELECT c.quantity, p.img, p.name, p.id, pr.price FROM cart c INNER JOIN product p ON c.product_id=p.id INNER JOIN price pr ON p.id=pr.product_id WHERE c.user_id = %s;"
         cursor.execute(sql, (user_id,))
         cart_items = cursor.fetchall()
 
@@ -195,12 +196,23 @@ def get_cart():
 
 @app.route("/api/add_to_cart", methods=["POST"])
 def add_to_cart():
-    product_id = request.headers.get("product_id")
-    user_id = request.headers.get("user_id")
+    try:
+        data = request.json  # Get data from the request body
+        product_id_str = data.get("product_id")
+        user_id_str = data.get("user_id")
+
+        if product_id_str is None or user_id_str is None:
+            return jsonify({"message": "Missing data"}), 400
+
+        product_id = int(product_id_str)
+        user_id = int(user_id_str)
+    except (ValueError, TypeError):
+        return jsonify({"message": "Invalid data"}), 400
+
     conn = pymysql.connect(**config)
 
     with conn.cursor() as cursor:
-        sql = "INSERT INTO cart(user_id, product_id, quantity) VALUES (%s, %s, 1)"
+        sql = "select * from cart where user_id = %s and product_id = %s"
         cursor.execute(
             sql,
             (
@@ -209,14 +221,153 @@ def add_to_cart():
             ),
         )
         result = cursor.fetchone()
+        print(result)
 
-    conn.commit()
+        if result:
+            temp_quantity = result["quantity"]
+            new_quantity = temp_quantity + 1
+            sql = "update cart set quantity = %s where product_id = %s and user_id = %s"
+            cursor.execute(
+                sql,
+                (
+                    new_quantity,
+                    product_id,
+                    user_id,
+                ),
+            )
+
+            conn.commit()
+            conn.close()
+
+            return jsonify({"message": "Added to cart"})
+        else:
+            with conn.cursor() as cursor:
+                sql = (
+                    "INSERT INTO cart(user_id, product_id, quantity) VALUES (%s, %s, 1)"
+                )
+                cursor.execute(
+                    sql,
+                    (
+                        user_id,
+                        product_id,
+                    ),
+                )
+
+            conn.commit()
+            conn.close()
+
+            if cursor.rowcount > 0:
+                return jsonify({"message": "Added to cart"})
+            else:
+                return jsonify({"message": "Not added to cart"}), 404
+
+
+@app.route("/api/carousel_products", methods=["GET"])
+def get_products():
+    conn = pymysql.connect(**config)
+
+    with conn.cursor() as cursor:
+        sql = "SELECT id, name, img FROM product limit 5"  # Adjust the query as needed
+        cursor.execute(sql)
+        products = cursor.fetchall()
+
     conn.close()
 
-    if result:
-        return jsonify({"message": "Added to cart"})
+    if products:
+        return jsonify(products)
     else:
-        return jsonify({"message": "Not added to cart"}), 404
+        return jsonify({"message": "No products found"}), 404
+
+
+@app.route("/api/remove_item", methods=["POST"])
+def remove_item():
+    try:
+        data = request.json  # Get data from the request body
+        product_id_str = data.get("product_id")
+        user_id_str = data.get("user_id")
+
+        if product_id_str is None or user_id_str is None:
+            return jsonify({"message": "Missing data"}), 400
+
+        product_id = int(product_id_str)
+        user_id = int(user_id_str)
+
+        conn = pymysql.connect(**config)
+
+        try:
+            with conn.cursor() as cursor:
+                sql = "DELETE FROM cart WHERE product_id = %s AND user_id = %s"
+                cursor.execute(sql, (product_id, user_id))
+                conn.commit()
+
+                if cursor.rowcount > 0:
+                    return jsonify({"message": "Removed from cart"}), 200
+                else:
+                    return jsonify({"message": "Failed to remove from cart"}), 404
+
+        except pymysql.Error as e:
+            # Handle SQL errors
+            return jsonify({"message": "Database error"}), 500
+
+        finally:
+            conn.close()
+
+    except (ValueError, TypeError):
+        return jsonify({"message": "Invalid data"}), 400
+
+
+@app.route("/api/remove_one", methods=["POST"])
+def remove_one():
+    try:
+        data = request.json  # Get data from the request body
+        product_id_str = data.get("product_id")
+        user_id_str = data.get("user_id")
+
+        if product_id_str is None or user_id_str is None:
+            return jsonify({"message": "Missing data"}), 400
+
+        product_id = int(product_id_str)
+        user_id = int(user_id_str)
+
+        conn = pymysql.connect(**config)
+
+        try:
+            with conn.cursor() as cursor:
+                # Check if the item exists in the cart
+                check_sql = (
+                    "SELECT quantity FROM cart WHERE product_id = %s AND user_id = %s"
+                )
+                cursor.execute(check_sql, (product_id, user_id))
+                result = cursor.fetchone()
+
+                if result is None:
+                    return jsonify({"message": "Item not found in cart"}), 404
+
+                # Update the quantity by subtracting 1
+                current_quantity = result["quantity"]
+                if current_quantity > 1:
+                    new_quantity = current_quantity - 1
+                    update_sql = "UPDATE cart SET quantity = %s WHERE product_id = %s AND user_id = %s"
+                    cursor.execute(update_sql, (new_quantity, product_id, user_id))
+                    conn.commit()
+                    return jsonify({"message": "Removed one item"}), 200
+                else:
+                    delete_sql = (
+                        "DELETE FROM cart WHERE product_id = %s AND user_id = %s"
+                    )
+                    cursor.execute(delete_sql, (product_id, user_id))
+                    conn.commit()
+                    return jsonify({"message": "Item removed from cart"}), 200
+
+        except Error as e:
+            # Handle SQL errors
+            return jsonify({"message": "Database error"}), 500
+
+        finally:
+            conn.close()
+
+    except (ValueError, TypeError):
+        return jsonify({"message": "Invalid data"}), 400
 
 
 if __name__ == "__main__":
