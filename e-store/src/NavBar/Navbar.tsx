@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import CartDialog from '@/Cart/CartDialog';
+import CartDialog2 from '@/Cart/CartDialog2';
 
 const Navbar: React.FC = () => {
   const isLoggedIn = localStorage.getItem('access_token');
@@ -41,9 +42,12 @@ const Navbar: React.FC = () => {
           <button className="text-white bg-transparent" onClick={handleCartButtonClick}>
               Cart
             </button>
-          <button className="text-white bg-transparent" onClick={() => (window.location.href = '/signup')}>
-            Sign Up
-          </button>
+            <CartDialog2 />
+            {!isLoggedIn && (
+              <button className="text-white bg-transparent" onClick={() => (window.location.href = '/signup')}>
+                Sign Up
+              </button>
+            )}
           {isLoggedIn ? (
             <button className="text-white bg-transparent" onClick={handleLogout}>
               Sign Out

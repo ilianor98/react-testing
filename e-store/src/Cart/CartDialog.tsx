@@ -50,7 +50,7 @@ const CartDialog: React.FC<CartDialogProps> = ({ onClose }) => {
     axios.post('http://localhost:8000/api/remove_one', {
       product_id: item.id,
       user_id: userId,
-    }).then((response) => {
+    }).then((_response) => {
       if (item.quantity > 1) {
         // Update cart items with decreased quantity
         const updatedCartItems = cartItems.map((cartItem) => {
@@ -75,7 +75,7 @@ const CartDialog: React.FC<CartDialogProps> = ({ onClose }) => {
     axios.post('http://localhost:8000/api/add_to_cart', {
       product_id: item.id,
       user_id: userId,
-    }).then((response) => {
+    }).then((_response) => {
       // Update cart items with increased quantity
       const updatedCartItems = cartItems.map((cartItem) => {
         if (cartItem.id === item.id) {
@@ -94,7 +94,7 @@ const CartDialog: React.FC<CartDialogProps> = ({ onClose }) => {
     axios.post('http://localhost:8000/api/remove_item', {
       product_id: item.id,
       user_id: userId,
-    }).then((response) => {
+    }).then((_response) => {
       // Update cart items by filtering out the removed item
       const updatedCartItems = cartItems.filter((cartItem) => cartItem.id !== item.id);
       setCartItems(updatedCartItems);
@@ -106,20 +106,21 @@ const CartDialog: React.FC<CartDialogProps> = ({ onClose }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-6 rounded-md w-3/4 h-3/4 overflow-y-auto">
-        <h2 className="text-lg font-semibold mb-4 text-black text-center">Your Cart</h2>
+        <h1 className="text-2xl font-semibold mb-4 text-black text-center">Your Cart</h1>
         <table className="w-full text-black">
-          <thead>
+          <thead className='bg-slate-500'>
             <tr>
               <th>Name</th>
               <th>Image</th>
               <th>Quantity</th>
               <th>Price</th>
+              <th></th>
             </tr>
           </thead>
           <tbody className='bg-slate-400'>
             {cartItems.map((item, index) => (
               <tr key={index}>
-                <td className='text-center'>{item.name}</td>
+                <td className='text-center text-xl'>{item.name}</td>
                 <td>
                 <div className="flex items-center justify-center">
                   <img src={item.img} alt={item.name} className="max-w-20 h-20" />

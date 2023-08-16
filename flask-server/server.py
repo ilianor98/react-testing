@@ -37,7 +37,7 @@ def product(product_id):
         sql = "select p.*, pr.price from product p inner join price pr on p.id= pr.product_id where pr.product_id = %s;"
         cursor.execute(sql, (product_id,))
         product = cursor.fetchone()
-
+        print(product)
     conn.close()
     if product:
         data = {
@@ -368,6 +368,17 @@ def remove_one():
 
     except (ValueError, TypeError):
         return jsonify({"message": "Invalid data"}), 400
+
+
+@app.route("/api/categories", methods=["GET"])
+def get_categories():
+    conn = pymysql.connect(**config)
+    with conn.cursor() as cursor:
+        sql = "SELECT name FROM categories"
+        cursor.execute(sql)
+        categories = cursor.fetchall()
+    conn.close()
+    return jsonify(categories)
 
 
 if __name__ == "__main__":
