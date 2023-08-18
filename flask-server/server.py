@@ -98,7 +98,7 @@ def login():
     conn = pymysql.connect(**config)
 
     with conn.cursor() as cursor:
-        sql = "SELECT * FROM user WHERE email = %s AND password = %s"
+        sql = "SELECT u.*, a.is_admin FROM user u INNER JOIN admin a ON u.id=a.user_id WHERE u.email = %s AND u.password = %s"
         cursor.execute(
             sql,
             (
@@ -115,6 +115,7 @@ def login():
             "user_id": user["id"],
             "username": user["username"],
             "email": user["email"],
+            "is_admin": user["is_admin"],
         }
         # Generate JWT
         access_token = generate_jwt(user_data)
@@ -124,6 +125,7 @@ def login():
                 "message": "Login successful",
                 "access_token": access_token,
                 "user_id": user_data["user_id"],
+                "is_admin": user_data["is_admin"],
             }
         )
 
@@ -379,6 +381,52 @@ def get_categories():
         categories = cursor.fetchall()
     conn.close()
     return jsonify(categories)
+
+
+@app.route("/api/add_product", methods=["POST"])
+def add_product():
+    data = request.json
+    name = data.get("name")
+    description = data.get("description")
+    img = data.get("img")
+    price = data.get("price")
+
+    conn = pymysql.connect(**config)
+
+    try:
+        with conn.cursor() as cursor:
+            # Call the add_product stored procedure
+            cursor.callproc("add_product", (name, description, img, price))
+        conn.commit()
+
+        return jsonify({"message": "Product added successfully"})
+    except Exception as e:
+        print("Error:", e)
+        conn.rollback()
+        return jsonify({"message": "Failed to add product"}), 500
+    finally:
+        conn.close()
+
+
+@app.route("/api/delete_product", methods=["POST"])
+def delete_product():
+    data = request.json
+    product_id = data.get("product_id")
+
+    conn = pymysql.connect(**config)
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.callproc("delete_product", (product_id,))
+        conn.commit()
+
+        return jsonify({"message": "Product deleted successfully"})
+    except Exception as e:
+        print("Error:", e)
+        conn.rollback()
+        return jsonify({"message": "Failed to delete product"}), 500
+    finally:
+        conn.close()
 
 
 if __name__ == "__main__":

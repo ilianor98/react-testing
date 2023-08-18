@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+//import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  /*DialogDescription,
+  DialogFooter,*/
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
 
 interface CartItem {
   id: number;
@@ -9,12 +20,9 @@ interface CartItem {
   price: number;
 }
 
-interface CartDialogProps {
-  onClose: () => void;
-}
+const CartDialog: React.FC = () => {
 
-const CartDialog: React.FC<CartDialogProps> = ({ onClose }) => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+    const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   // Retrieve user_id from localStorage
   const userId = localStorage.getItem('user_id');
@@ -102,75 +110,75 @@ const CartDialog: React.FC<CartDialogProps> = ({ onClose }) => {
       console.error('Error removing item:', error);
     });
   };
-  
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-md w-3/4 h-3/4 overflow-y-auto">
-        <h1 className="text-2xl font-semibold mb-4 text-black text-center">Your Cart</h1>
-        <table className="w-full text-black">
-          <thead className='bg-slate-500'>
-            <tr>
-              <th>Name</th>
-              <th>Image</th>
-              <th>Quantity</th>
-              <th>Price</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody className='bg-slate-400'>
-            {cartItems.map((item, index) => (
-              <tr key={index}>
-                <td className='text-center text-xl'>{item.name}</td>
-                <td>
-                <div className="flex items-center justify-center">
-                  <img src={item.img} alt={item.name} className="max-w-20 h-20" />
-                </div>
-                </td>
-                <td className='text-center items-center flex justify-center mt-3'>
-                  <div className="flex items-center">
-                    <button
-                      className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                      onClick={() => handleDecreaseQuantity(item)}
-                    >
-                      -
-                    </button>
-                    <span className="mx-2">{item.quantity}</span>
-                    <button
-                      className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-                      onClick={() => handleIncreaseQuantity(item)}
-                    >
-                      +
-                    </button>
-                  </div>
-                </td>
-                <td className='text-center'>${Number(item.price).toFixed(2)}</td>
-                <td className='text-center'>
-                  <button
-                    className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                    onClick={() => handleRemoveCartItem(item)}
-                  >
-                    Remove
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className='text-black flex font-bold items-end justify-end'>
-          <h2>Total:</h2>
-         <h2>${calculateTotal(cartItems).toFixed(2)}</h2>
-        </div>
-        <div className='flex items-center justify-center'>
-        <button
-          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          onClick={onClose}
-        >
-          Close
-        </button>
-        </div>
-      </div>
-    </div>
-  );
-};
+
+
+    return (
+        <Dialog>
+          <DialogTrigger asChild>
+            <button>Cart</button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-screen-lg">
+            <DialogHeader>
+              <DialogTitle className='text-center text-2xl'>Your Cart</DialogTitle>
+              
+            </DialogHeader>
+            <table className="table-auto">
+                <thead className='bg-slate-500'>
+                <tr>
+                  <th>Name</th>
+                  <th>Image</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody className='bg-slate-400'>
+                {cartItems.map((item, index) => (
+                  <tr key={index}>
+                    <td className='text-center text-xl'>{item.name}</td>
+                    <td>
+                    <div className="flex items-center justify-center">
+                      <img src={item.img} alt={item.name} className="max-w-20 h-20" />
+                    </div>
+                    </td>
+                    <td className='text-center items-center flex justify-center mt-3'>
+                      <div className="flex items-center">
+                        <button
+                          className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                          onClick={() => handleDecreaseQuantity(item)}
+                        >
+                          -
+                        </button>
+                        <span className="mx-2">{item.quantity}</span>
+                        <button
+                          className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                          onClick={() => handleIncreaseQuantity(item)}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </td>
+                    <td className='text-center'>${Number(item.price).toFixed(2)}</td>
+                    <td className='text-center'>
+                      <button
+                        className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                        onClick={() => handleRemoveCartItem(item)}
+                      >
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className='text-black flex font-bold items-end justify-end bg-slate-500'>
+                <h2>Total:</h2>
+              <h2>${calculateTotal(cartItems).toFixed(2)}</h2>
+              </div>
+            
+          </DialogContent>
+        </Dialog>
+      );
+  };
 
 export default CartDialog;

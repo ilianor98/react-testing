@@ -1,0 +1,56 @@
+DELIMITER //
+
+CREATE PROCEDURE add_product(
+  IN p_name VARCHAR(255),
+  IN p_description TEXT,
+  IN p_img VARCHAR(255),
+  IN p_price DECIMAL(10, 2)
+)
+BEGIN
+  -- Insert into the product table
+  INSERT INTO product (name, description, img) VALUES (p_name, p_description, p_img);
+  
+  -- Get the auto-generated product ID
+  SET product_id = SELECT id FROM product WHERE name = p_name, description = p_description, img = p_img;
+
+  -- Insert into the price table
+  INSERT INTO price (product_id, price) VALUES (product_id, p_price);
+  
+
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE delete_product(IN p_product_id INT)
+BEGIN
+    DECLARE product_count INT;
+
+    -- Check if the product exists
+    SELECT COUNT(*) INTO product_count FROM product WHERE id = p_product_id;
+
+    IF product_count > 0 THEN
+        -- Delete from the cart table
+        DELETE FROM cart WHERE product_id = p_product_id;
+
+        -- Delete from the stock table
+        DELETE FROM stock WHERE product_id = p_product_id;
+
+        -- Delete from the product_category table
+        DELETE FROM product_category WHERE product_id = p_product_id;
+
+        -- Delete from the price table
+        DELETE FROM price WHERE product_id = p_product_id;
+
+        -- Delete from the product table
+        DELETE FROM product WHERE id = p_product_id;
+
+        SELECT 'Product deleted successfully' AS message;
+    ELSE
+        SELECT 'Product not found' AS message;
+    END IF;
+END //
+
+DELIMITER ;

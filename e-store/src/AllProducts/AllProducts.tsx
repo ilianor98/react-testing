@@ -30,7 +30,7 @@ const AllProducts: React.FC = () => {
     <main className='m-24 rounded-md grid grid-cols-4 gap-12'>
       {products.map((product) => (
         <Link to={`/product/${product.id}`} key={product.id}>
-          <div className='col-span-4 md:col-span-2 bg-slate-700 text-center h-80 w-96'>
+          <div className='col-span-4 md:col-span-2 bg-slate-700 text-center h-80 w-96 border-solid '>
             <h1>{product.name}</h1>
             <p>{product.description}</p>
             <div className='flex items-center justify-center'>
@@ -40,7 +40,7 @@ const AllProducts: React.FC = () => {
                 alt={product.name}
               />
             </div>
-            <p>{product.price} $</p>
+            <h2>{product.price} $</h2>
           </div>
         </Link>
       ))}
