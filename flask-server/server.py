@@ -265,11 +265,11 @@ def add_to_cart():
 
 
 @app.route("/api/carousel_products", methods=["GET"])
-def get_products():
+def carousel_products():
     conn = pymysql.connect(**config)
 
     with conn.cursor() as cursor:
-        sql = "SELECT id, name, img FROM product limit 5"  # Adjust the query as needed
+        sql = "SELECT p.id, p.name, p.img, pr.price FROM product p INNER JOIN price pr ON p.id=pr.product_id ORDER BY RAND() LIMIT 10"
         cursor.execute(sql)
         products = cursor.fetchall()
 

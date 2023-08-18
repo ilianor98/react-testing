@@ -11,12 +11,16 @@ import Login from './LogIn/Login';
 import Signup from './SignUp/Signup'
 import CategoriesList from './Lists/CategoriesList';
 import Admin from './Admin/Admin';
+import CarouselTest from './Carousel/CarouselTest';
+
 
 const Index: React.FC = () => {
 
   return (
     <div>
-      
+      <div className="2xl:container 2xl:mx-auto 2xl:px-0 py-3 px-10">
+      <CarouselTest />
+    </div>
     <div className=''>
       <span className=' left-0 w-full inline-grid grid-cols-7 gap-4 text-center justify-center'>
       <span></span>
