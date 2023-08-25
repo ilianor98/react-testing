@@ -1,27 +1,21 @@
-import React, { useState } from 'react';
 import CartDialog from '@/Cart/CartDialog';
+import React from 'react';
+
+
 
 const Navbar: React.FC = () => {
   const isLoggedIn = localStorage.getItem('access_token');
+  const isAdmin = localStorage.getItem('is_admin') === '1';
 
   const handleLogout = () => {
     // Clear the access token from local storage
     localStorage.removeItem('access_token');
+    localStorage.setItem('user_id', "0");
 
     // Perform any additional logout-related actions, e.g., notify the server
 
-    // Redirect to the login page
-    window.location.href = '/'; // You might need to adjust the URL
-  };
-
-  const [cartDialogOpen, setCartDialogOpen] = useState(false);
-
-  const handleCartButtonClick = () => {
-    setCartDialogOpen(true);
-  };
-
-  const handleCloseCartDialog = () => {
-    setCartDialogOpen(false);
+    // Redirect to the index page
+    window.location.href = '/';
   };
 
   return (
@@ -31,18 +25,24 @@ const Navbar: React.FC = () => {
           My E-Store
         </a>
         <div className="flex space-x-4">
+          {isAdmin && ( // Render the "Admin" button only for admin users
+              <button className="text-white bg-transparent" onClick={() => (window.location.href = '/admin')}>
+                Admin
+              </button>
+            )}
           <button className="text-white bg-transparent" onClick={() => (window.location.href = '/')}>
             Home
           </button>
           <button className="text-white bg-transparent" onClick={() => (window.location.href = '/all_products')}>
             Products
           </button>
-          <button className="text-white bg-transparent" onClick={handleCartButtonClick}>
-              Cart
-            </button>
-          <button className="text-white bg-transparent" onClick={() => (window.location.href = '/signup')}>
-            Sign Up
-          </button>
+          
+            <CartDialog />
+            {!isLoggedIn && (
+              <button className="text-white bg-transparent" onClick={() => (window.location.href = '/signup')}>
+                Sign Up
+              </button>
+            )}
           {isLoggedIn ? (
             <button className="text-white bg-transparent" onClick={handleLogout}>
               Sign Out
@@ -54,7 +54,7 @@ const Navbar: React.FC = () => {
           )}
         </div>
       </div>
-      {cartDialogOpen && <CartDialog onClose={handleCloseCartDialog}/>}
+      
     </nav>
   );
 };

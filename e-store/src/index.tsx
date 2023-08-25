@@ -1,7 +1,7 @@
 // src/Index.tsx
-import React from 'react';
+import React, { /*useState, useEffect*/ } from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, /*Link*/ } from 'react-router-dom';
 import './index.css';
 import App from './App';
 import ProductDetails from './ProductDetails/ProductDetails';
@@ -9,36 +9,41 @@ import AllProducts from './AllProducts/AllProducts';
 import Navbar from './NavBar/Navbar';
 import Login from './LogIn/Login';
 import Signup from './SignUp/Signup'
+import CategoriesList from './Lists/CategoriesList';
+import Admin from './Admin/Admin';
+import CarouselTest from './Carousel/CarouselTest';
+
 
 const Index: React.FC = () => {
+
   return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="container mx-auto p-8">
-      <h1>Welcome to My E-Store TEST TEST</h1>
-      <p>Choose an option:</p>
-      <ul className='flex'>
-        <li className='flex'>
-          <Link to="/product/1">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              View Product 1
-            </button>
-          </Link>
-          <Link to="/product/2">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              View Product 2
-            </button>
-          </Link>
-          <Link to="/all_products">
-            <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-              View all products
-            </button>
-          </Link>
-        </li>
-      </ul>
-      </div>
+    <div>
+      <div className="2xl:container 2xl:mx-auto 2xl:px-0 py-3 px-10">
+      <CarouselTest />
+    </div>
+    <div className=''>
+      <span className=' left-0 w-full inline-grid grid-cols-7 gap-4 text-center justify-center'>
+      <span></span>
+      <span>
+      <CategoriesList />
+      </span>
+      <span>TEST SPAN </span>
+      <span>
+        <CategoriesList />
+      </span>
+      <span>04</span>
+      <span>05</span>
+      <span></span>
+      </span>
+    
+    
+    
+    </div>
     </div>
   );
 };
+
+
 
 const Root: React.FC = () => {
     return (
@@ -50,6 +55,7 @@ const Root: React.FC = () => {
           <Route path="/all_products" element={<AllProducts />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
       </Router>
     );

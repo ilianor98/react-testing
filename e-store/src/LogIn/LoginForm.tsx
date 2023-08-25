@@ -23,6 +23,7 @@ const LoginForm = () => {
         // Store the token in localStorage
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('user_id', data.user_id);
+        localStorage.setItem('is_admin', data.is_admin)
 
         setLoginMessage('Login successful');
         window.location.href = '/';

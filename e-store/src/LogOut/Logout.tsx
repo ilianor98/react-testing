@@ -6,6 +6,7 @@ const logout = async (accessToken: string) => {
 
     if (response.status === 200) {
       // Handle successful logout, e.g., redirect to login page
+      localStorage.setItem('user_id', "0");
       window.location.href = '/login'; // You might need to adjust the URL
     } else {
       // Handle error, e.g., display an error message
