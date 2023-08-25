@@ -1,0 +1,6 @@
+CALL add_product(
+  'ASUS TUF Gaming GeForce RTX 4070 OC Edition Gaming Graphics Card (PCIe 4.0, 12GB GDDR6X, DLSS 3, HDMI 2.1A, DisplayPort 1.4A)',
+  'Component and trace layouts have been optimized onto a short PCB to reduce power losses and let heat escape through a massive backplate vent. ',
+  'https://m.media-amazon.com/images/I/81MOy4AJsSL._AC_SL1500_.jpg',
+  599.99
+);
